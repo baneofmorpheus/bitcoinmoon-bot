@@ -1,0 +1,31 @@
+{
+  "sessions": [
+    {
+      "id": "464326749:464326749",
+      "data": {
+        "points": 20,
+        "timeUp": false,
+        "mode": "quiz",
+        "currentSelection": {
+          "question": "Bitcoin Moon tierless launchpad system implies that:",
+          "options": [
+            {
+              "text": "Holders get equal staking rewards"
+            },
+            {
+              "text": "Participants get equal allocation",
+              "answer": true
+            },
+            {
+              "text": "Participants' allocations are categorized into 5 tiers only"
+            },
+            {
+              "text": "Allocations will not be vested"
+            }
+          ],
+          "answered": false
+        }
+      }
+    }
+  ]
+}
