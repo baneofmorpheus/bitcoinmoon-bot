@@ -6,7 +6,7 @@ exports.handleRequestData = (ctx) => {
   if (!ctx.session.sentQuizCompletionMsg) {
     successMsg = `You've completed the quiz \n You  have  ${ctx.session.points} points.
  Please provide the following data below \n    
-\n ${newQuestionAndOptions}`;
+\n `;
     ctx.session.sentQuizCompletionMsg = true;
   }
   if (!ctx.session.requestData.gmail) {

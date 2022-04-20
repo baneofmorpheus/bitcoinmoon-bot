@@ -1,3 +1,6 @@
+var _ = require('lodash');
+const { bot } = require('./telegraf');
+
 exports.selectQuestion = (ctx) => {
   if (ctx.session.availableQuestions.length < 1) {
     return { text: 'Quiz Completed', status: 'quiz_completed' };
@@ -33,7 +36,7 @@ exports.handleQuestionAnswer = (ctx) => {
   );
 
   if (Number(ctx.message.text) !== correctAnswer + 1) {
-    const newQuestionAndOptions = selectQuestion(ctx);
+    const newQuestionAndOptions = exports.selectQuestion(ctx);
 
     console.log('correct answer');
     console.log(correctAnswer);
@@ -50,7 +53,7 @@ exports.handleQuestionAnswer = (ctx) => {
   }
   ctx.session.points = +20;
 
-  const newQuestionAndOptions = selectQuestion(ctx);
+  const newQuestionAndOptions = exports.selectQuestion(ctx);
 
   bot.telegram.sendMessage(
     ctx.chat.id,

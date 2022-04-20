@@ -1,19 +1,22 @@
-var _ = require('lodash');
 const { selectQuestion } = require('./quiz');
 const { questions } = require('./questions');
-const { handleRequestData, handleQuizMode } = require('./helpers');
+const {
+  handleRequestData,
+  handleQuizMode,
+  handleReferall,
+} = require('./helpers');
 const { bot } = require('./telegraf');
 require('dotenv').config();
 
 try {
   const handleText = (ctx) => {
     switch (ctx.session.mode) {
-      case 'question':
-        return handleQuizMode();
+      case 'quiz':
+        return handleQuizMode(ctx);
       case 'request_data':
-        return handleRequestData();
+        return handleRequestData(ctx);
       case 'referall':
-        return handleReferall();
+        return handleReferall(ctx);
 
       default:
         throw new Error(`invalid mode - ${ctx.session.mode}`);
@@ -63,7 +66,7 @@ Type "Join Airdrop" to start
     console.log(ctx.session);
     ctx.session.points = 0;
     ctx.session.mode = 'quiz';
-    ctx.session.availableQuestions = availableQuestions;
+    ctx.session.availableQuestions = questions;
 
     const questionResponse = selectQuestion(ctx);
 
