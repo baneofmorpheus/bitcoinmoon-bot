@@ -1,57 +1,47 @@
-const { bot } = require('./telegraf');
-const { handleQuestionAnswer } = require('./quiz');
+export const formatQuestions = (questions) => {
+  const formattedQuestions = questions.map((question) => {
+    let response = `${question.question} \n `;
 
-exports.handleRequestData = (ctx) => {
-  let successMsg;
-  if (!ctx.session.sentQuizCompletionMsg) {
-    successMsg = `You've completed the quiz \n You  have  ${ctx.session.points} points.
- Please provide the following data below \n    
-\n `;
-    ctx.session.sentQuizCompletionMsg = true;
-  }
-  if (!ctx.session.requestData.gmail) {
-    return bot.telegram.sendMessage(
-      ctx.chat.id,
-      `${successMsg} Send your gmail address`,
-      {}
-    );
-  }
-  if (!ctx.session.requestData.bitmWallet) {
-    return bot.telegram.sendMessage(
-      ctx.chat.id,
-      `${successMsg} Send your BITM wallet address`,
-      {}
-    );
-  }
+    question['options'].forEach((option, index) => {
+      response = response + `${index + 1}) ${option.text} \n`;
+    });
 
-  ctx.session.mode = 'referall';
+    return response;
+  });
+
+  return formattedQuestions;
 };
 
-exports.handleReferall = (ctx) => {
-  return bot.telegram.sendMessage(
-    ctx.chat.id,
-    `This is your referal link \n Referall  `,
-    {}
+export const handleTimer = (ctx) => {
+  const now = new Date();
+
+  const diffInSeconds =
+    (now.getTime() - ctx.session.questionDispatchTime.getTime()) / 1000;
+  if (diffInSeconds > 20) {
+    return 'expired';
+  }
+  return 'valid';
+};
+
+export const handleQuestionAnswer = (ctx) => {
+  const correctAnswer = ctx.session.currentSelection.options.findIndex(
+    (option) => {
+      return option.answer === true;
+    }
   );
-};
 
-exports.handleQuizMode = (ctx) => {
-  console.log('state');
-  console.log(ctx.session);
-  if (isNaN(ctx.message.text)) {
-    return bot.telegram.sendMessage(
-      ctx.chat.id,
-      `That command is not recognized.  \n Please try again.`,
-      {}
+  if (Number(ctx.message.text) !== correctAnswer + 1) {
+    ctx.reply(
+      `Your answer is incorrect. \n You  have  ${ctx.session.points} points.`
     );
-  }
 
-  if (Number(ctx.message.text) < 1 || Number(ctx.message.text) > 4) {
-    return bot.telegram.sendMessage(
-      ctx.chat.id,
-      `Invalid option.  \n Select from 1-4.`,
-      {}
-    );
+    return;
   }
-  return handleQuestionAnswer(ctx);
+  ctx.session.points = ctx.session.points + 20;
+
+  ctx.reply(
+    `Your answer is correct. \n You  have  ${ctx.session.points} points.`
+  );
+
+  return;
 };

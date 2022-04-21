@@ -1,101 +1,210 @@
-const { selectQuestion } = require('./quiz');
-const { questions } = require('./questions');
-const {
-  handleRequestData,
-  handleQuizMode,
-  handleReferall,
-} = require('./helpers');
-const { bot } = require('./telegraf');
-require('dotenv').config();
+import 'dotenv/config';
+
+import { contactDataWizard, requestData } from './scenes.js';
+import { firestore } from './db.js';
+import { bot } from './telegraf.js';
+import { Scenes, Markup } from 'telegraf';
+import { setDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 try {
-  const handleText = (ctx) => {
-    switch (ctx.session.mode) {
-      case 'quiz':
-        return handleQuizMode(ctx);
-      case 'request_data':
-        return handleRequestData(ctx);
-      case 'referall':
-        return handleReferall(ctx);
+  const stage = new Scenes.Stage([contactDataWizard, requestData]);
 
-      default:
-        throw new Error(`invalid mode - ${ctx.session.mode}`);
+  bot.use(stage.middleware());
+
+  /**Handle New Users */
+  bot.on('new_chat_members', async (ctx) => {
+    console.log('new channel user');
+    console.log(ctx.message.new_chat_members);
+
+    const docRef = doc(firestore, 'group_members', 'new_users');
+    const docSnap = await getDoc(docRef);
+
+    const newUsers = docSnap.data();
+
+    const mergedUsers = ctx.message.new_chat_members.concat(newUsers.users);
+
+    //  update the new users
+    await updateDoc(docRef, {
+      users: mergedUsers,
+    });
+  });
+
+  /**
+   * Navigate to page 2
+   */
+  bot.action('page2', async (ctx) => {
+    const docRef = doc(firestore, 'group_members', 'new_users');
+    const docSnap = await getDoc(docRef);
+
+    const newUsers = docSnap.data();
+
+    const existingUser = newUsers.users.find((user) => {
+      return user === ctx.chat.username;
+    });
+
+    if (!existingUser) {
+      return ctx.reply('Please join our telegram group before you can proceed');
     }
-  };
+
+    bot.telegram.sendMessage(
+      ctx.chat.id,
+      `
+Complete all tasks \n
+Answer all questions \n
+1 question = 20 marks \n
+20 seconds per question \n
+50 and above qualifies for airdrop \n
+Answer by dropping the number corresponding to your answer from the option e.g "1"\n
+Please do the required tasks and get above average to be eligible to get the NFT Airdrop. \n
+Airdrop starts 19th April ends 25th April, distribution starts 26th April. \n
+
+      `,
+      {}
+    );
+
+    ctx.reply("Start the quiz when you're ready", {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '✅ Start Quiz', callback_data: 'start_quiz' }],
+        ],
+      },
+    });
+  });
+
+  /**
+   * Handle Referall Link
+   */
+  bot.hears(/^\/start[ =](.+)$/, async (ctx) => {
+    // console.log('deep link');
+    // console.log(ctx.match[1]);
+
+    /**
+     * Check for existing user
+     */
+    const docRef = doc(firestore, 'users', ctx.from.username);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return await ctx.reply(`You have already taken this quiz. \n    `, {});
+    }
+
+    await setDoc(doc(firestore, 'users', ctx.from.username), {
+      points: 0,
+      gmail: '',
+      bitmWallet: '',
+      telegram: '',
+    });
+
+    console.log('started bot');
+    console.log(ctx.chat);
+    ctx.session = {
+      points: 0,
+      currentSelection: '',
+      questionsAnswered: 0,
+      cursor: 0,
+      questionDispatchTime: false,
+      newUsers: [],
+      ref: ctx.match[1],
+      requestData: {
+        gmail: '',
+        bitmWallet: '',
+        telegram: '',
+      },
+    };
+    await ctx.reply(
+      `Hello ${ctx.from.first_name} I am your BITM EASTER EGG HUNT Airdrop Bot \n
+Join our Twitter https://twitter.com/Bitcoin__Moon?s=09  \n
+Join our Instagram: https://www.instagram.com/bitcoinmoon_insta/
+ \n
+Join our Telegram: https://t.me/+XuK6oN958bk5Njk0 
+ \n
+Join our Discord: https://discord.gg/fygeuB5NPf   \n
+      `,
+      {}
+    );
+
+    ctx.reply("Move to the next step when you're done", {
+      parse_mode: 'HTML',
+      ...Markup.inlineKeyboard([Markup.button.callback('✅ Proceed', 'page2')]),
+    });
+  });
 
   /**
    * Start Bot
    */
-  bot.command('start', (ctx) => {
+  bot.command('start', async (ctx) => {
+    /**
+     * Check for existing user
+     */
+    const docRef = doc(firestore, 'users', ctx.from.username);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return await ctx.reply(`You have already taken this quiz. \n    `, {});
+    }
+
+    await setDoc(doc(firestore, 'users', ctx.from.username), {
+      points: 0,
+      gmail: '',
+      bitmWallet: '',
+      telegram: '',
+    });
+
     console.log('started bot');
-    console.log(ctx.from);
+    console.log(ctx.chat);
     ctx.session = {
       points: 0,
-      timeUp: false,
-      mode: 'quiz',
-      availableQuestions: questions,
-      sentQuizCompletionMsg: false,
+      currentSelection: '',
+      questionsAnswered: 0,
+      cursor: 0,
+      questionDispatchTime: false,
+      newUsers: [],
+      refererr: '',
       requestData: {
         gmail: '',
         bitmWallet: '',
+        telegram: '',
       },
     };
-
-    bot.telegram.sendMessage(
-      ctx.chat.id,
+    await ctx.reply(
       `Hello ${ctx.from.first_name} I am your BITM EASTER EGG HUNT Airdrop Bot \n
-Complete all tasks \n
-Answer all questions \n
-1 question = 20 marks \n
-50 and above qualifies for airdrop \n
-Please do the required tasks and get above average to be eligible to get the NFT Airdrop. \n
-Airdrop starts 19th April ends 25th April, distribution starts 26th April. \n
-Type "Join Airdrop" to start
+Join our Twitter https://twitter.com/Bitcoin__Moon?s=09  \n
+Join our Instagram: https://www.instagram.com/bitcoinmoon_insta/
+ \n
+Join our Telegram: https://t.me/+XuK6oN958bk5Njk0 
+ \n
+Join our Discord: https://discord.gg/fygeuB5NPf   \n
       `,
       {}
     );
+
+    ctx.reply("Move to the next step when you're done", {
+      parse_mode: 'HTML',
+      ...Markup.inlineKeyboard([Markup.button.callback('✅ Proceed', 'page2')]),
+    });
   });
 
   /**
    * Start quiz
    */
-  bot.hears('Join Airdrop', (ctx) => {
+  bot.action('start_quiz', (ctx) => {
     console.log(ctx.from);
 
-    console.log('current session');
-    console.log(ctx.session);
-    ctx.session.points = 0;
-    ctx.session.mode = 'quiz';
-    ctx.session.availableQuestions = questions;
+    ctx.scene.leave();
+    ctx.session = {
+      points: 0,
+      currentSelection: '',
+      questionsAnswered: 0,
+      cursor: 0,
+      questionDispatchTime: false,
+      newUsers: [],
+      requestData: {
+        gmail: '',
+        bitmWallet: '',
+        telegram: '',
+      },
+    };
 
-    const questionResponse = selectQuestion(ctx);
-
-    if (questionResponse.status == 'quiz_completed') {
-      if (ctx.session.points < 50) {
-        return bot.telegram.sendMessage(
-          ctx.chat.id,
-          `You completed the quiz but got only  ${ctx.session.points} points and so you're not eligible for our airdrop.`,
-          {}
-        );
-      }
-      ctx.session.mode = 'request_data';
-      return handleRequestData(ctx);
-    }
-
-    bot.telegram.sendMessage(ctx.chat.id, questionResponse.text, {});
-    ctx.session.timeUp = false;
+    ctx.scene.enter('quiz');
   });
-
-  bot.on('text', (ctx) => {
-    console.log('current session');
-    console.log(ctx.session);
-    console.log(ctx.message);
-    handleText(ctx);
-  });
-
-  // gmail
-  // bit wallet address
-  // telegram name
 
   bot.launch();
 } catch (err) {

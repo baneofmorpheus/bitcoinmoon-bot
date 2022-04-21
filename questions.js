@@ -1,7 +1,7 @@
 /**
  * List of questions for airdrop
  */
-exports.questions = [
+export const questions = [
   {
     question: 'Bitcoin Moon tierless launchpad system implies that:',
     options: [
