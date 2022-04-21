@@ -7,6 +7,7 @@ import { Scenes, Markup } from 'telegraf';
 import { setDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 try {
+  console.log('starting script');
   const stage = new Scenes.Stage([contactDataWizard, requestData]);
 
   bot.use(stage.middleware());
