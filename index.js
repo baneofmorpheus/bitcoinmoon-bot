@@ -123,6 +123,7 @@ Join our Instagram: https://www.instagram.com/bitcoinmoon_insta/
 Join our Telegram: https://t.me/+XuK6oN958bk5Njk0 
  \n
 Join our Discord: https://discord.gg/fygeuB5NPf   \n
+Join our Facebook: https://www.facebook.com/104780618768936/  \n
       `,
       {}
     );

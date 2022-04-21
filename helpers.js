@@ -17,13 +17,13 @@ export const handleTimer = (ctx) => {
 
   const diffInSeconds =
     (now.getTime() - ctx.session.questionDispatchTime.getTime()) / 1000;
-  if (diffInSeconds > 20) {
+  if (diffInSeconds > 25) {
     return 'expired';
   }
   return 'valid';
 };
 
-export const handleQuestionAnswer = (ctx) => {
+export const handleQuestionAnswer = async (ctx) => {
   const correctAnswer = ctx.session.currentSelection.options.findIndex(
     (option) => {
       return option.answer === true;
@@ -31,7 +31,7 @@ export const handleQuestionAnswer = (ctx) => {
   );
 
   if (Number(ctx.message.text) !== correctAnswer + 1) {
-    ctx.reply(
+    await ctx.reply(
       `Your answer is incorrect. \n You  have  ${ctx.session.points} points.`
     );
 
@@ -39,7 +39,7 @@ export const handleQuestionAnswer = (ctx) => {
   }
   ctx.session.points = ctx.session.points + 20;
 
-  ctx.reply(
+  await ctx.reply(
     `Your answer is correct. \n You  have  ${ctx.session.points} points.`
   );
 
