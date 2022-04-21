@@ -16,12 +16,16 @@ try {
     console.log('new channel user');
     console.log(ctx.message.new_chat_members);
 
+    const formattedMembers = ctx.message.new_chat_members.map((member) => {
+      return member.username;
+    });
+
     const docRef = doc(firestore, 'group_members', 'new_users');
     const docSnap = await getDoc(docRef);
 
     const newUsers = docSnap.data();
 
-    const mergedUsers = ctx.message.new_chat_members.concat(newUsers.users);
+    const mergedUsers = formattedMembers.concat(newUsers.users);
 
     //  update the new users
     await updateDoc(docRef, {
