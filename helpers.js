@@ -30,6 +30,13 @@ export const handleQuestionAnswer = async (ctx) => {
     }
   );
 
+  if (isNaN(ctx.message.text)) {
+    await ctx.reply(
+      `You can only answer with a number corresponding to the option you pick \nE.g 1 to pick the first option. \nThis question will be skipped.`
+    );
+    return;
+  }
+
   if (Number(ctx.message.text) !== correctAnswer + 1) {
     await ctx.reply(
       `Your answer is incorrect. \n You  have  ${ctx.session.points} points.`
