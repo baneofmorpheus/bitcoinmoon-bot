@@ -199,6 +199,8 @@ Join our Discord: https://discord.gg/fygeuB5NPf   \n
     /**
      * Reset db for tests
      */
+
+    await ctx.reply('Resetting database for this user,please hold on.');
     const docRef = doc(firestore, 'users', ctx.from.username);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
