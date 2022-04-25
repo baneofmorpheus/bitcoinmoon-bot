@@ -4,7 +4,14 @@ import { contactDataWizard, requestData } from './scenes.js';
 import { firestore } from './db.js';
 import { bot } from './telegraf.js';
 import { Scenes, Markup } from 'telegraf';
-import { setDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
+import {
+  setDoc,
+  doc,
+  getDoc,
+  updateDoc,
+  deleteDoc,
+  collection,
+} from 'firebase/firestore';
 
 try {
   console.log('starting script');
@@ -188,6 +195,35 @@ Join our Discord: https://discord.gg/fygeuB5NPf   \n
     });
   });
 
+  bot.command('reset', async (ctx) => {
+    /**
+     * Reset db for tests
+     */
+    const docRef = doc(firestore, 'users', ctx.from.username);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      await deleteDoc(doc(firestore, 'users', ctx.from.username));
+    }
+
+    const newUsersRef = doc(firestore, 'group_members', 'new_users');
+    const newUserData = await getDoc(newUsersRef);
+
+    const newUsers = newUserData.data();
+
+    const filteredUsers = newUsers.users.filter(function (savedUser) {
+      return savedUser !== ctx.from.username;
+    });
+
+    //  update the new users
+    await updateDoc(docRef, {
+      users: filteredUsers,
+    });
+
+    return await ctx.reply(
+      "You've reset your account data. \nYou can proceed by running /start"
+    );
+  });
+
   /**
    * Start quiz
    */
@@ -214,5 +250,13 @@ Join our Discord: https://discord.gg/fygeuB5NPf   \n
 
   bot.launch();
 } catch (err) {
+  await addDoc(collection(firestore, 'errors'), {
+    username: ctx.from.username,
+    error: err.message,
+  });
+
+  await ctx.reply(
+    "There's been an error with this bot\nContact the admin for more details"
+  );
   console.log(err);
 }
