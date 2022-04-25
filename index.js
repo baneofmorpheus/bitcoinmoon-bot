@@ -221,9 +221,10 @@ Join our Discord: https://discord.gg/fygeuB5NPf   \n
       users: filteredUsers,
     });
 
-    return await ctx.reply(
+    await ctx.reply(
       "You've reset your account data. \nYou can proceed by running /start"
     );
+    return;
   });
 
   /**
