@@ -217,7 +217,7 @@ Join our Discord: https://discord.gg/fygeuB5NPf   \n
     });
 
     //  update the new users
-    await updateDoc(docRef, {
+    await updateDoc(newUsersRef, {
       users: filteredUsers,
     });
 
