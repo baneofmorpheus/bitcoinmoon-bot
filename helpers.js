@@ -1,9 +1,9 @@
 export const formatQuestions = (questions) => {
   const formattedQuestions = questions.map((question) => {
-    let response = `${question.question} \n `;
+    let response = `${question.question} \n\n`;
 
     question['options'].forEach((option, index) => {
-      response = response + `${index + 1}) ${option.text} \n`;
+      response = response + `${index + 1} )  ${option.text} \n`;
     });
 
     return response;
@@ -23,7 +23,7 @@ export const handleTimer = (ctx) => {
   return 'valid';
 };
 
-export const handleQuestionAnswer = async (ctx) => {
+export const handleQuestionAnswer = async (ctx, final = false) => {
   const correctAnswer = ctx.session.currentSelection.options.findIndex(
     (option) => {
       return option.answer === true;
@@ -37,18 +37,10 @@ export const handleQuestionAnswer = async (ctx) => {
     return;
   }
 
-  if (Number(ctx.message.text) !== correctAnswer + 1) {
-    await ctx.reply(
-      `Your answer is incorrect. \n You  have  ${ctx.session.points} points.`
-    );
-
-    return;
+  if (Number(ctx.message.text) === correctAnswer + 1) {
+    ctx.session.points = ctx.session.points + 20;
   }
-  ctx.session.points = ctx.session.points + 20;
-
-  await ctx.reply(
-    `Your answer is correct. \n You  have  ${ctx.session.points} points.`
-  );
+  await ctx.reply(`Thank you for your response,answer next question.`);
 
   return;
 };

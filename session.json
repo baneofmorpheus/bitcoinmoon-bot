@@ -3,19 +3,41 @@
     {
       "id": "464326749:464326749",
       "data": {
-        "points": 0,
-        "currentSelection": "",
+        "points": 40,
+        "currentSelection": {
+          "question": "What is the Bitcoin Moon stablecoin ticker?",
+          "options": [
+            {
+              "text": "USDT"
+            },
+            {
+              "text": "BTCMS"
+            },
+            {
+              "text": "BITUS"
+            },
+            {
+              "text": "BITMS",
+              "answer": true
+            }
+          ],
+          "answered": false
+        },
         "questionsAnswered": 0,
-        "cursor": 0,
-        "questionDispatchTime": false,
+        "cursor": 3,
+        "questionDispatchTime": "2022-04-28T01:56:09.885Z",
         "newUsers": [],
-        "refererr": "",
         "requestData": {
           "gmail": "",
           "bitmWallet": "",
           "telegram": ""
         },
-        "__scenes": {}
+        "__scenes": {
+          "current": "quiz",
+          "state": {},
+          "cursor": 8
+        },
+        "timeUp": false
       }
     },
     {
@@ -71,6 +93,12 @@
     },
     {
       "id": "-607831510:1520776561",
+      "data": {
+        "__scenes": {}
+      }
+    },
+    {
+      "id": "-1001433755527:464326749",
       "data": {
         "__scenes": {}
       }

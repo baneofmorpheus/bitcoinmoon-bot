@@ -17,11 +17,11 @@ const formattedQuestions = formatQuestions(shuffledQuestions);
 /**Run quiz */
 export const contactDataWizard = new Scenes.WizardScene(
   'quiz',
-  (ctx) => {
+  async (ctx) => {
     console.log(formattedQuestions[0]);
 
     console.log(questions[0]);
-    ctx.reply(formattedQuestions[0]);
+    await ctx.reply(formattedQuestions[0]);
 
     ctx.session.questionDispatchTime = new Date();
     ctx.session.currentSelection = questions[0];
@@ -37,7 +37,7 @@ export const contactDataWizard = new Scenes.WizardScene(
       await handleQuestionAnswer(ctx);
     }
 
-    ctx.reply(formattedQuestions[1]);
+    await ctx.reply(formattedQuestions[1]);
     ctx.session.questionDispatchTime = new Date();
     ctx.session.currentSelection = questions[1];
     ctx.session.cursor = ctx.scene.session.cursor + 1;
@@ -53,7 +53,7 @@ export const contactDataWizard = new Scenes.WizardScene(
     }
 
     ctx.session.timeUp = false;
-    ctx.reply(formattedQuestions[2]);
+    await ctx.reply(formattedQuestions[2]);
     ctx.session.questionDispatchTime = new Date();
     ctx.session.currentSelection = questions[2];
     ctx.session.cursor = ctx.scene.session.cursor + 1;
@@ -67,7 +67,7 @@ export const contactDataWizard = new Scenes.WizardScene(
     } else {
       await handleQuestionAnswer(ctx);
     }
-    ctx.reply(formattedQuestions[3]);
+    await ctx.reply(formattedQuestions[3]);
     ctx.session.questionDispatchTime = new Date();
 
     ctx.session.currentSelection = questions[3];
@@ -80,7 +80,7 @@ export const contactDataWizard = new Scenes.WizardScene(
     } else {
       await handleQuestionAnswer(ctx);
     }
-    ctx.reply(formattedQuestions[4]);
+    await ctx.reply(formattedQuestions[4]);
     ctx.session.questionDispatchTime = new Date();
 
     ctx.session.currentSelection = questions[4];
@@ -93,7 +93,7 @@ export const contactDataWizard = new Scenes.WizardScene(
     } else {
       await handleQuestionAnswer(ctx);
     }
-    ctx.reply(formattedQuestions[5]);
+    await ctx.reply(formattedQuestions[5]);
     ctx.session.currentSelection = questions[5];
     ctx.session.questionDispatchTime = new Date();
 
@@ -106,7 +106,7 @@ export const contactDataWizard = new Scenes.WizardScene(
     } else {
       await handleQuestionAnswer(ctx);
     }
-    ctx.reply(formattedQuestions[6]);
+    await ctx.reply(formattedQuestions[6]);
     ctx.session.questionDispatchTime = new Date();
 
     ctx.session.currentSelection = questions[6];
@@ -120,7 +120,7 @@ export const contactDataWizard = new Scenes.WizardScene(
     } else {
       await handleQuestionAnswer(ctx);
     }
-    ctx.reply(formattedQuestions[7]);
+    await ctx.reply(formattedQuestions[7]);
     ctx.session.questionDispatchTime = new Date();
 
     ctx.session.currentSelection = questions[7];
@@ -131,7 +131,7 @@ export const contactDataWizard = new Scenes.WizardScene(
     if (expiryStatus == 'expired') {
       await ctx.reply(`Your time for this question is up \n`);
     } else {
-      await handleQuestionAnswer(ctx);
+      await handleQuestionAnswer(ctx, true);
     }
 
     if (ctx.session.ref) {
@@ -145,11 +145,19 @@ export const contactDataWizard = new Scenes.WizardScene(
         });
       }
     }
+
     if (ctx.session.points < 50) {
-      return ctx.reply(
-        `You have ${ctx.session.points} points and are not eligible for our airdrop`
+      await ctx.reply(
+        `Congrats on completing the quiz.\nYou have ${ctx.session.points} points and are not eligible for our airdrop`
       );
+      await ctx.reply(
+        `Here's your referall link https://t.me/bitcoinmoonairdropbot?start=${ctx.from.username}`
+      );
+      return;
     }
+    await ctx.reply(
+      `Congrats on completing the quiz.\nYou have ${ctx.session.points} points and are  eligible for our airdrop`
+    );
 
     /**
      * Update points
@@ -159,7 +167,7 @@ export const contactDataWizard = new Scenes.WizardScene(
       points: ctx.session.points,
     });
 
-    ctx.scene.leave();
+    await ctx.scene.leave();
     return ctx.scene.enter('request_for_data');
   }
 );
@@ -167,13 +175,13 @@ export const contactDataWizard = new Scenes.WizardScene(
 /**Request for user data */
 export const requestData = new Scenes.WizardScene(
   'request_for_data',
-  (ctx) => {
-    ctx.reply('Send your email');
+  async (ctx) => {
+    await ctx.reply('Send your email');
     return ctx.wizard.next();
   },
-  (ctx) => {
+  async (ctx) => {
     ctx.session.requestData.gmail = ctx.message.text;
-    ctx.reply('Whats your BITM wallet address');
+    await ctx.reply('Whats your BITM wallet address');
 
     return ctx.wizard.next();
   },
@@ -191,10 +199,7 @@ export const requestData = new Scenes.WizardScene(
       telegram: ctx.session.requestData.gmail,
     });
 
-    ctx.reply(
-      `Here's your referall link https://t.me/bitcoinmoonairdropbot?start=${ctx.from.username}`
-    );
-
-    return ctx.scene.leave();
+    await ctx.scene.leave();
+    return;
   }
 );
