@@ -3,7 +3,7 @@ export const formatQuestions = (questions) => {
     let response = `${question.question} \n\n`;
 
     question['options'].forEach((option, index) => {
-      response = response + `${index + 1} )  ${option.text} \n`;
+      response = response + `${index + 1} )  ${option.text} \n\n`;
     });
 
     return response;
