@@ -153,6 +153,7 @@ export const contactDataWizard = new Scenes.WizardScene(
       await ctx.reply(
         `Here's your referall link https://t.me/bitcoinmoonairdropbot?start=${ctx.from.username}`
       );
+      await ctx.scene.leave();
       return;
     }
     await ctx.reply(

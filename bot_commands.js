@@ -70,7 +70,8 @@ Airdrop starts 19th April ends 25th April, distribution starts 26th April. \n
     /**
      * Check for existing user
      */
-    await ctx.scene.leave();
+    await ctx.scene.leave('quiz');
+    await ctx.scene.leave('request_for_data');
     const docRef = doc(firestore, 'users', ctx.from.username);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
@@ -122,7 +123,8 @@ Airdrop starts 19th April ends 25th April, distribution starts 26th April. \n
     /**
      * Check for existing user
      */
-    await ctx.scene.leave();
+    await ctx.scene.leave('quiz');
+    await ctx.scene.leave('request_for_data');
     const docRef = doc(firestore, 'users', ctx.from.username);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
@@ -172,7 +174,8 @@ Airdrop starts 19th April ends 25th April, distribution starts 26th April. \n
      * Reset db for tests
      */
 
-    await ctx.scene.leave();
+    await ctx.scene.leave('quiz');
+    await ctx.scene.leave('request_for_data');
 
     await ctx.reply('Resetting database for this user,please hold on.');
     const docRef = doc(firestore, 'users', ctx.from.username);
@@ -258,7 +261,8 @@ Airdrop starts 19th April ends 25th April, distribution starts 26th April. \n
   bot.action('start_quiz', async (ctx) => {
     console.log(ctx.from);
 
-    await ctx.scene.leave();
+    await ctx.scene.leave('quiz');
+    await ctx.scene.leave('request_for_data');
     ctx.session = {
       points: 0,
       currentSelection: '',

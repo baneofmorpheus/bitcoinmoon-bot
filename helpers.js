@@ -14,9 +14,9 @@ export const formatQuestions = (questions) => {
 
 export const handleTimer = (ctx) => {
   const now = new Date();
+  const savedDate = new Date(ctx.session.questionDispatchTime);
 
-  const diffInSeconds =
-    (now.getTime() - ctx.session.questionDispatchTime.getTime()) / 1000;
+  const diffInSeconds = (now.getTime() - savedDate.getTime()) / 1000;
   if (diffInSeconds > 25) {
     return 'expired';
   }
