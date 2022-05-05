@@ -146,19 +146,7 @@ export const contactDataWizard = new Scenes.WizardScene(
       }
     }
 
-    if (ctx.session.points < 50) {
-      await ctx.reply(
-        `Congrats on completing the quiz.\nYou have ${ctx.session.points} points and are not eligible for our airdrop`
-      );
-      await ctx.reply(
-        `Here's your referall link https://t.me/bitcoinmoonairdropbot?start=${ctx.from.username}`
-      );
-      await ctx.scene.leave();
-      return;
-    }
-    await ctx.reply(
-      `Congrats on completing the quiz.\nYou have ${ctx.session.points} points and are  eligible for our airdrop`
-    );
+    await ctx.reply(`Congrats on completing the quiz`);
 
     /**
      * Update points
@@ -170,6 +158,44 @@ export const contactDataWizard = new Scenes.WizardScene(
 
     await ctx.scene.leave();
     return ctx.scene.enter('request_for_data');
+  }
+);
+
+/**Handle social media */
+export const socialMediaScene = new Scenes.WizardScene(
+  'social_media',
+  async (ctx) => {
+    await ctx.reply('Join our Discord: https://discord.gg/fygeuB5NPf');
+    await ctx.reply("Drop your handle for verification when you're done");
+
+    return ctx.wizard.next();
+  },
+  async (ctx) => {
+    await ctx.reply(
+      'Join our Instagram: https://www.instagram.com/bitcoinmoon_insta/'
+    );
+    await ctx.reply("Drop your handle for verification when you're done");
+    return ctx.wizard.next();
+  },
+  async (ctx) => {
+    await ctx.reply('Join our Twitter: https://twitter.com/Bitcoin__Moon?s=09');
+    await ctx.reply("Drop your handle for verification when you're done");
+    return ctx.wizard.next();
+  },
+  async (ctx) => {
+    await ctx.reply(
+      'Join our Facebook: https://www.facebook.com/104780618768936/'
+    );
+    await ctx.reply("Drop your handle for verification when you're done");
+    return ctx.wizard.next();
+  },
+  async (ctx) => {
+    await ctx.scene.leave();
+    await ctx.reply('Click the button below to proceed', {
+      reply_markup: {
+        inline_keyboard: [[{ text: '✅ Proceed', callback_data: 'page2' }]],
+      },
+    });
   }
 );
 
@@ -199,7 +225,9 @@ export const requestData = new Scenes.WizardScene(
       bitmWallet: ctx.session.requestData.bitmWallet,
       telegram: ctx.session.requestData.gmail,
     });
-
+    await ctx.reply(
+      `Here's your referall link https://t.me/bitcoinmoonairdropbot?start=${ctx.from.username}`
+    );
     await ctx.scene.leave();
     return;
   }

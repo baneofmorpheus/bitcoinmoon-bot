@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import { contactDataWizard, requestData } from './scenes.js';
+import { contactDataWizard, requestData, socialMediaScene } from './scenes.js';
 import { firestore } from './db.js';
 import { bot } from './telegraf.js';
 import { Scenes, Markup } from 'telegraf';
@@ -8,7 +8,11 @@ import { setDoc, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 export const initBot = () => {
   console.log('starting script');
-  const stage = new Scenes.Stage([contactDataWizard, requestData]);
+  const stage = new Scenes.Stage([
+    contactDataWizard,
+    requestData,
+    socialMediaScene,
+  ]);
 
   bot.use(stage.middleware());
 
@@ -38,8 +42,7 @@ export const initBot = () => {
    * Navigate to page 2
    */
   bot.action('page2', async (ctx) => {
-    bot.telegram.sendMessage(
-      ctx.chat.id,
+    await ctx.reply(
       `
 Complete all tasks \n
 Answer all questions \n
@@ -174,6 +177,7 @@ Airdrop starts 19th April ends 25th April, distribution starts 26th April. \n
      * Reset db for tests
      */
 
+    await ctx.scene.leave('social_media');
     await ctx.scene.leave('quiz');
     await ctx.scene.leave('request_for_data');
 
@@ -217,42 +221,17 @@ Airdrop starts 19th April ends 25th April, distribution starts 26th April. \n
 
     if (!existingUser) {
       await ctx.reply('Please join our telegram group before you can proceed');
+      await ctx.reply('Join our Telegram: https://t.me/+XuK6oN958bk5Njk0 ', {
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '✅ Proceed', callback_data: 'verify_telegram' }],
+          ],
+        },
+      });
       return;
     }
 
-    await ctx.reply(
-      'Join our Instagram: https://www.instagram.com/bitcoinmoon_insta/',
-      {
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: '✅ Proceed', callback_data: 'handle_instagram' }],
-          ],
-        },
-      }
-    );
-  });
-
-  /**Handle Instagram */
-  bot.action('handle_instagram', async (ctx) => {
-    await ctx.reply('Join our Discord: https://discord.gg/fygeuB5NPf ', {
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: '✅ Proceed', callback_data: 'handle_discord' }],
-        ],
-      },
-    });
-  });
-
-  /**Handle Discord */
-  bot.action('handle_discord', async (ctx) => {
-    await ctx.reply(
-      'Join our Facebook: https://www.facebook.com/104780618768936/',
-      {
-        reply_markup: {
-          inline_keyboard: [[{ text: '✅ Proceed', callback_data: 'page2' }]],
-        },
-      }
-    );
+    ctx.scene.enter('social_media');
   });
 
   /**

@@ -1,3 +1,31 @@
 {
-  "sessions": []
+  "sessions": [
+    {
+      "id": "464326749:464326749",
+      "data": {
+        "points": 0,
+        "currentSelection": "",
+        "questionsAnswered": 0,
+        "cursor": 0,
+        "questionDispatchTime": false,
+        "newUsers": [],
+        "requestData": {
+          "gmail": "",
+          "bitmWallet": "",
+          "telegram": ""
+        },
+        "__scenes": {
+          "current": "quiz",
+          "state": {},
+          "cursor": 0
+        }
+      }
+    },
+    {
+      "id": "-1001433755527:464326749",
+      "data": {
+        "__scenes": {}
+      }
+    }
+  ]
 }

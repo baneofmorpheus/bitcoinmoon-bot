@@ -1,6 +1,6 @@
 export const formatQuestions = (questions) => {
-  const formattedQuestions = questions.map((question) => {
-    let response = `${question.question} \n\n`;
+  const formattedQuestions = questions.map((question, index) => {
+    let response = `Question ${index + 1})\n${question.question} \n\n`;
 
     question['options'].forEach((option, index) => {
       response = response + `${index + 1} )  ${option.text} \n\n`;
@@ -40,7 +40,7 @@ export const handleQuestionAnswer = async (ctx, final = false) => {
   if (Number(ctx.message.text) === correctAnswer + 1) {
     ctx.session.points = ctx.session.points + 20;
   }
-  await ctx.reply(`Thank you for your response,answer next question.`);
+  await ctx.reply(`Thank you for your response`);
 
   return;
 };
